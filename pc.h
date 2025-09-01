@@ -14,10 +14,10 @@ private:
     std::exponential_distribution<double> interArrivalDist;
 public:
     PC(int id, double lambda);
-    Packet generatePacket(double currentTime);
+    Packet generatePacket(double currentTime, int destId);
     double getNextPacketDelay();
     void receivePacket(const Packet& p, Link* incomingLink) override;
-    void sendPacket(double currentTime) override;
+    void sendPacket(double currentTime, int destId) override;
 
 };
 
