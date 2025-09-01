@@ -12,6 +12,7 @@ private:
     int packetCounter;
     std::default_random_engine generator;
     std::exponential_distribution<double> interArrivalDist;
+    double congestionWaitTime;
 public:
     PC(int id, double lambda);
     Packet generatePacket(double currentTime, int destId);
