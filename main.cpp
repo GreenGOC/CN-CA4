@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     net.connect(pc2, r1);
     net.connect(r1, pc3);
 
-    net.run(10.0);
+    net.run(100.0);
 
-    return a.exec();
+    return 0;
 }

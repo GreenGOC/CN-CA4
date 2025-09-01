@@ -4,12 +4,12 @@
 #include <iostream>
 
 PC::PC(int id, double lambda): Node(id), packetCounter(0), interArrivalDist(lambda) {
-    generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+    generator.seed(std::chrono::system_clock::now().time_since_epoch().count() + this->id);
 }
 
 Packet PC::generatePacket(double currentTime, int destId){
     this->packetCounter++;
-    std::string text;
+    std::string text = "THIS IS FROM PC " + std::to_string(this->id) + ". OVER\n";
     int size = text.length();
     int id = destId;
     return Packet(packetCounter, this->id, id, size, currentTime, text);
@@ -26,10 +26,12 @@ void PC::receivePacket(const Packet& p, Link* incomingLink){
 }
 
 void PC::sendPacket(double currentTime, int destId) {
+    std::cout << "Current Time: " << currentTime << ":\n";
     if(!this->links.empty()){
         Packet p = this->generatePacket(currentTime, destId);
-        links[0]->send(p, this); // TODO: This is hardcoded as well.
         std::cout << "PC " << this->id << " has sent Packet " << p.id << " to " << p.destId << std::endl;
+
+        links[0]->send(p, this); // TODO: This is hardcoded as well.
     } else{
         std::cout << "PC " << this->id << " is isolated! " << std::endl;
     }

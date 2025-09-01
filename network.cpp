@@ -1,6 +1,7 @@
 #include "network.h"
 #include "Link.h"
-#include <iostream>
+#include <QThread>
+#include <thread>
 
 Network::Network() {}
 
@@ -37,16 +38,18 @@ void Network::connect(Node* a, Node* b) {
 
 void Network::run(double endTime) {
     double currentTime = 0.0;
-
+    bool routerWait = false;
     while (currentTime < endTime) {
         for (auto pc : endNodes) {
             pc->sendPacket(currentTime, 3);  // Yes. It's hardcoded! // TODO
         }
         for (auto r : routers) {
-            r->sendPacket(currentTime);
+            if(!routerWait)
+                r->sendPacket(currentTime);
         }
-
-        currentTime += 0.1;
+        QThread::msleep(500);
+        routerWait = !routerWait;
+        currentTime += 0.5;
     }
 }
 

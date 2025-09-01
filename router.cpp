@@ -24,6 +24,8 @@ void Router::receivePacket(const Packet& p, Link* source) {
 }
 
 void Router::sendPacket(double currentTime, int destId) {
+    std::cout << "Current Time: " << currentTime << ":\n";
+
     if (buffer.empty()) return;
 
     Packet p = buffer.front();
@@ -37,9 +39,15 @@ void Router::sendPacket(double currentTime, int destId) {
                 break;
             }
         }
-        links[linkIndex]->send(p, this);
+        if(linkIndex == -1){
+            std::cerr << "[Router] No ARP entry for dest " << p.destId << std::endl;
+            return;
+        }
         std::cout << "[Router] Forwarded Packet " << p.id << " From router to " << p.destId
                   << " at time " << currentTime << std::endl;
+
+
+        links[linkIndex]->send(p, this);
     }
 }
 
