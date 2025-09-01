@@ -37,19 +37,36 @@ void Network::connect(Node* a, Node* b) {
 }
 
 void Network::run(double endTime) {
+    double slowDown = 1000.0;
     double currentTime = 0.0;
     bool routerWait = false;
     while (currentTime < endTime) {
-        for (auto pc : endNodes) {
-            pc->sendPacket(currentTime, 3);  // Yes. It's hardcoded! // TODO
+        double nextEventTime = endTime;
+        PC* nextPC = nullptr;
+        Router* nextRouter = nullptr;
+
+        for (auto pc : this->endNodes) {
+            if (pc->getNextSendTime() < nextEventTime) {
+                nextEventTime = pc->getNextSendTime();
+                nextPC = pc;
+            }
         }
-        for (auto r : routers) {
-            if(!routerWait)
-                r->sendPacket(currentTime);
+        for (auto router : this->routers){
+            if(router->getNextSendTime() < nextEventTime){
+                nextEventTime = router->getNextSendTime();
+                nextRouter = router;
+            }
         }
-        QThread::msleep(500);
-        routerWait = !routerWait;
-        currentTime += 0.5;
+
+        if (!nextPC && !nextRouter) break;
+        QThread::msleep((nextEventTime - currentTime) * slowDown);
+        currentTime = nextEventTime;
+
+        if(nextRouter){
+            nextRouter->sendPacket(currentTime);
+        }else if(nextPC){
+            nextPC->sendPacket(currentTime, 3); // HARDCODED FELLAS
+        }
     }
 }
 

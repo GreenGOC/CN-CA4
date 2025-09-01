@@ -13,8 +13,9 @@ protected:
     int id;
     std::vector<Link*> links;
     std::vector<std::pair<int, int>> ARPTable;
+    double nextSendTime;
 public:
-    Node(int id) : id(id){}
+    Node(int id) : id(id), nextSendTime(0.0){}
     virtual ~Node() {};
 
     void connectLink(Link* link);
