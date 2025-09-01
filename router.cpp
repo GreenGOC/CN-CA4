@@ -1,5 +1,6 @@
 #include "router.h"
 #include "Link.h"
+#include "pc.h"
 #include <iostream>
 #include <cstdlib>   // rand()
 
@@ -16,6 +17,11 @@ bool Router::runRED() {
 void Router::receivePacket(const Packet& p, Link* source) {
     if (runRED()) {
         std::cout << "[Router] RED dropped Packet " << p.id << " From " << p.sourceId << std::endl;
+        
+        // Check for congestion signal
+        if (buffer.size() >= MAX_THRESHOLD) {
+            sendCongestionSignal();
+        }
     } else {
         buffer.push(p);
         std::cout << "[Router] Enqueued Packet " << p.id << " From " << p.sourceId << " to " << p.destId
@@ -55,4 +61,20 @@ void Router::setARPTable(int id, int linkIndex) {
     if (linkIndex >= 0 && linkIndex < (int)links.size()) {
         ARPTable.push_back({id, linkIndex});
     }
+}
+
+void Router::sendCongestionSignal() {
+    // Create a special congestion signal packet
+    // We'll use destId = -1 to mark it as a signal
+    Packet signalPacket(0, this->id, -1, 0, 0, "CONGESTION SIGNAL");
+    
+    // Loop through all connected links and send the signal to source PCs (1 and 2)
+    // You have PC1 (ID 1) and PC2 (ID 2) connected to the router
+    // This part assumes you know the IDs of the sender PCs
+    for (auto& link : this->links) {
+        if (link->getOtherEnd(this)->getId() == 1 || link->getOtherEnd(this)->getId() == 2) {
+            link->send(signalPacket, this);
+        }
+    }
+    std::cout << "[Router] Sent a congestion signal to the sender PCs." << std::endl;
 }
