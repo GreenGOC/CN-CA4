@@ -499,5 +499,3 @@ This project simulates the Random Early Detection (RED) algorithm to manage netw
 - RED parameters are hardcoded in `router.h`.
 - Refer to Piazza for rules.
 
-## License
-Educational use only; distribution requires permission.
